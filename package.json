@@ -1,0 +1,50 @@
+{
+  "name": "vue-collaborative-editor",
+  "version": "1.0.0",
+  "description": "A simple Vue component for collaborative rich-text editing using Y.js.",
+  "main": "dist/vue-collaborative-editor.umd.js",
+  "module": "dist/vue-collaborative-editor.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/vue-collaborative-editor.es.js",
+      "require": "./dist/vue-collaborative-editor.umd.js"
+    },
+    "./dist/style.css": "./dist/style.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "yjs": "^13.6.8",
+    "y-websocket": "^1.5.0"
+  },
+  "peerDependencies": {
+    "vue": "^3.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.2.3",
+    "vite": "^4.4.9",
+    "vue": "^3.3.4"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "yjs",
+    "collaborative",
+    "editor",
+    "real-time",
+    "rich-text"
+  ],
+  "author": "Jairo A. Medina",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+[https://github.com/jamone19/vue-collaborative-editor.git](https://github.com/jamone19/vue-collaborative-editor.git)"
+  }
+}
+
