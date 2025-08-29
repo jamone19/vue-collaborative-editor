@@ -234,5 +234,5 @@ yarn run dev
 
 4. **Access the demo:**
 
-- Demo app: [http://localhost:4001](http://localhost:4001)
+- Access the Demo app from multiple browers in the same machine: [http://localhost:4001](http://localhost:4001)
 - Websocket server: `ws://localhost:1234`  
