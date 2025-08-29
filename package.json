@@ -29,7 +29,8 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",
     "vite": "^4.4.9",
-    "vue": "^3.3.4"
+    "vue": "^3.3.4",
+    "y-websocket": "^1.5.0"
   },
   "keywords": [
     "vue",
@@ -40,11 +41,10 @@
     "real-time",
     "rich-text"
   ],
-  "author": "Jairo A. Medina",
+  "author": "Your Name",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+[https://github.com/jamone19/vue-collaborative-editor.git](https://github.com/jamone19/vue-collaborative-editor.git)"
+    "url": "git+https://github.com/your-username/vue-collaborative-editor.git"
   }
 }
-
