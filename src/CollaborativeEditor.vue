@@ -29,64 +29,112 @@ const editorRef = ref(null);
 // Y.js instances
 let ydoc = null;
 let provider = null;
-let yText = null; // Switched from Y.XmlFragment to Y.Text
+let yText = null;
 
-// Flag to prevent infinite loops between Y.js and the DOM
+// Flag to prevent infinite loops
 let isUpdatingFromYjs = false;
 
-// Function to handle local user input
+// --- CURSOR POSITION HELPER FUNCTIONS ---
+
+// Saves the current cursor position within the editor
+function saveSelection(containerEl) {
+  const selection = window.getSelection();
+  if (selection.rangeCount === 0) {
+    return null;
+  }
+  const range = selection.getRangeAt(0);
+  const preSelectionRange = range.cloneRange();
+  preSelectionRange.selectNodeContents(containerEl);
+  preSelectionRange.setEnd(range.startContainer, range.startOffset);
+  const start = preSelectionRange.toString().length;
+
+  return {
+    start: start,
+    end: start + range.toString().length
+  };
+}
+
+// Restores the cursor position based on the saved offsets
+function restoreSelection(containerEl, savedSelection) {
+  if (!savedSelection) {
+    return;
+  }
+  let charIndex = 0;
+  const range = document.createRange();
+  range.setStart(containerEl, 0);
+  range.collapse(true);
+  const nodeStack = [containerEl];
+  let node, foundStart = false;
+  const stop = false;
+
+  while (!stop && (node = nodeStack.pop())) {
+    if (node.nodeType === 3) { // Text node
+      const nextCharIndex = charIndex + node.length;
+      if (!foundStart && savedSelection.start >= charIndex && savedSelection.start <= nextCharIndex) {
+        range.setStart(node, savedSelection.start - charIndex);
+        foundStart = true;
+      }
+      if (foundStart && savedSelection.end >= charIndex && savedSelection.end <= nextCharIndex) {
+        range.setEnd(node, savedSelection.end - charIndex);
+        break;
+      }
+      charIndex = nextCharIndex;
+    } else {
+      let i = node.childNodes.length;
+      while (i--) {
+        nodeStack.push(node.childNodes[i]);
+      }
+    }
+  }
+
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+
+// --- Y.js SYNC FUNCTIONS ---
+
 const handleLocalUpdate = () => {
   if (isUpdatingFromYjs || !yText || !editorRef.value) {
     return;
   }
-
   const newContent = editorRef.value.innerHTML;
-
-  // Only update if the content has actually changed to prevent unnecessary transactions
   if (newContent !== yText.toString()) {
     ydoc.transact(() => {
-      // Replace the entire content of the Y.Text type with the new HTML string
       yText.delete(0, yText.length);
       yText.insert(0, newContent);
     });
   }
 };
 
-// Function to render remote changes into the editor
 const renderRemoteChanges = () => {
   if (!editorRef.value) return;
 
+  // Save cursor position before updating the DOM
+  const savedSelection = saveSelection(editorRef.value);
+
   isUpdatingFromYjs = true;
   editorRef.value.innerHTML = yText.toString();
+  isUpdatingFromYjs = false;
 
-  // A timeout helps prevent the update loop
-  setTimeout(() => {
-    isUpdatingFromYjs = false;
-  }, 0);
+  // Restore cursor position after the DOM has been updated
+  restoreSelection(editorRef.value, savedSelection);
 };
 
 onMounted(() => {
-  // Initialize Y.js document
   ydoc = new Y.Doc();
-
-  // Connect to the WebSocket provider with the given room name
   provider = new WebsocketProvider(props.websocketUrl, props.roomName, ydoc);
-
-  // **FIX:** Use Y.Text to store the editor's HTML content as a shared string.
-  // This is simpler and more reliable than parsing the DOM with Y.XmlFragment.
   yText = ydoc.getText('shared-content');
 
-  // Listen for changes from other users
   yText.observe(renderRemoteChanges);
 
-  // Initial render of the content if it already exists
   if (yText.length > 0) {
     renderRemoteChanges();
   }
 });
 
 onUnmounted(() => {
-  // Clean up connections when the component is destroyed
   if (provider) {
     provider.disconnect();
   }
