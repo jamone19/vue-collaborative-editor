@@ -29,30 +29,27 @@ const editorRef = ref(null);
 // Y.js instances
 let ydoc = null;
 let provider = null;
-let yXmlFragment = null;
+let yText = null; // Switched from Y.XmlFragment to Y.Text
 
 // Flag to prevent infinite loops between Y.js and the DOM
 let isUpdatingFromYjs = false;
 
 // Function to handle local user input
 const handleLocalUpdate = () => {
-  if (isUpdatingFromYjs || !yXmlFragment || !editorRef.value) {
+  if (isUpdatingFromYjs || !yText || !editorRef.value) {
     return;
   }
 
-  // Perform changes within a Y.js transaction
-  ydoc.transact(() => {
-    // Clear the existing content
-    yXmlFragment.delete(0, yXmlFragment.length);
+  const newContent = editorRef.value.innerHTML;
 
-    // Parse the new HTML from the editor
-    const domParser = new DOMParser();
-    const doc = domParser.parseFromString(editorRef.value.innerHTML, 'text/html');
-    const newContent = Y.XmlFragment.fromDOM(doc.body);
-
-    // Insert the new content into the shared type
-    yXmlFragment.insert(0, [newContent]);
-  });
+  // Only update if the content has actually changed to prevent unnecessary transactions
+  if (newContent !== yText.toString()) {
+    ydoc.transact(() => {
+      // Replace the entire content of the Y.Text type with the new HTML string
+      yText.delete(0, yText.length);
+      yText.insert(0, newContent);
+    });
+  }
 };
 
 // Function to render remote changes into the editor
@@ -60,8 +57,9 @@ const renderRemoteChanges = () => {
   if (!editorRef.value) return;
 
   isUpdatingFromYjs = true;
-  editorRef.value.innerHTML = yXmlFragment.toString();
-  // A timeout helps prevent cursor jumping issues
+  editorRef.value.innerHTML = yText.toString();
+
+  // A timeout helps prevent the update loop
   setTimeout(() => {
     isUpdatingFromYjs = false;
   }, 0);
@@ -74,14 +72,17 @@ onMounted(() => {
   // Connect to the WebSocket provider with the given room name
   provider = new WebsocketProvider(props.websocketUrl, props.roomName, ydoc);
 
-  // Get the shared data type for our rich text content
-  yXmlFragment = ydoc.get('shared-content', Y.XmlFragment);
+  // **FIX:** Use Y.Text to store the editor's HTML content as a shared string.
+  // This is simpler and more reliable than parsing the DOM with Y.XmlFragment.
+  yText = ydoc.getText('shared-content');
 
   // Listen for changes from other users
-  yXmlFragment.observe(renderRemoteChanges);
+  yText.observe(renderRemoteChanges);
 
-  // Initial render of the content
-  renderRemoteChanges();
+  // Initial render of the content if it already exists
+  if (yText.length > 0) {
+    renderRemoteChanges();
+  }
 });
 
 onUnmounted(() => {
