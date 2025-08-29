@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, defineProps } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 
@@ -100,4 +100,3 @@ onUnmounted(() => {
   outline: none;
 }
 </style>
-
