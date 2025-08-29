@@ -207,26 +207,26 @@ The demo will be available at [http://localhost:4000](http://localhost:4000).
 
 You can run the entire development environment, including the websocket server and the demo app, inside a single ephemeral Podman container.
 
-1. **Clone the repository and navigate to the root directory:**
+1. **Run the ephemeral container:**
+
+```bash
+podman run -it --rm -p 1234:1234 -p 4001:4001 node:22-alpine /bin/sh
+apk add --update yarn git
+
+```
+2. **Clone the repository and navigate to the root directory:**
 
 ```bash
 git clone https://github.com/jamone19/vue-collaborative-editor.git
 cd vue-collaborative-editor
 ```
 
-2. **Run the ephemeral container:**
-
-```bash
-podman run -it --rm -p 1234:1234 -p 4000:4000   -w /app -v $(pwd):/app:z   -v /app/node_modules -v /app/demo-app/node_modules   node:22-alpine /bin/sh
-```
-
 3. **Inside the container's shell, run the setup script:**
 
 ```bash
-apk add --update yarn
 yarn install
 echo "Starting websocket server..."
-yarn y-websocket &
+HOST=0.0.0.0 yarn y-websocket &
 cd demo-app
 yarn install
 yarn run dev
@@ -234,5 +234,5 @@ yarn run dev
 
 4. **Access the demo:**
 
-- Demo app: [http://localhost:4000](http://localhost:4000)  
+- Demo app: [http://localhost:4001](http://localhost:4001)
 - Websocket server: `ws://localhost:1234`  
