@@ -153,7 +153,7 @@ import CollaborativeEditor from 'vue-collaborative-editor';
 
 This project is licensed under the **Apache License 2.0**. See the [LICENSE](LICENSE) file for details.
 
-**Important**: By using this software, you also agree to the terms outlined in the [ADDENDUM.md](ADDENDUM.md) file, which includes important clauses on indemnification and liability.
+**Important**: By using this software, you also agree to the terms outlined in the [Addendum.md](Addendum.md) file, which includes important clauses on indemnification and liability.
 
 ---
 
