@@ -188,7 +188,7 @@ npm install
 3. **Start the y-websocket server (in a separate terminal):**
 
 ```bash
-npx y-websocket
+yarn y-websocket &
 ```
 
 4. **Run the demo app:**
@@ -226,7 +226,7 @@ podman run -it --rm -p 1234:1234 -p 4000:4000   -w /app -v $(pwd):/app:z   -v /a
 apk add --update yarn
 yarn install
 echo "Starting websocket server..."
-npx y-websocket &
+yarn y-websocket &
 cd demo-app
 yarn install
 yarn run dev
