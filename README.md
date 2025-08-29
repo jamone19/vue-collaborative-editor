@@ -199,7 +199,7 @@ npm install
 npm run dev
 ```
 
-The demo will be available at [http://localhost:4000](http://localhost:4000).
+The demo will be available at [http://localhost:4001](http://localhost:4001).
 
 ---
 
